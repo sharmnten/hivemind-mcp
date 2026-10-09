@@ -5,6 +5,23 @@ dashboard, REST API, and stateless Streamable HTTP MCP endpoint at `/mcp`.
 Supabase remains the database and authentication backend; its installed Cron
 jobs handle synchronization recovery and retention.
 
+Created through the Render plugin on October 9, 2026 in the confirmed
+**My Workspace** (`tea-d5jr91dactks73cfm32g`), using the Free plan:
+
+- Service: `srv-db4jsc49v7es738br3h0`
+- [Dashboard](https://dashboard.render.com/web/srv-db4jsc49v7es738br3h0)
+- Application: <https://mio-hivemind.onrender.com>
+- MCP endpoint: <https://mio-hivemind.onrender.com/mcp>
+- Initial deployed commit: `0dcd1d72986424dd9db32506a918458ac9db1ef7`
+
+The first deployment reached `live`. Both `/health` and `/ready` returned 200,
+unauthenticated REST and MCP returned 401, the MCP resource discovery URL matched
+the public endpoint, and a hostile browser origin was rejected with 403.
+GitHub CI passed all 51 tests, TypeScript checks, and the production build.
+The hosted dashboard's sign-in form also loaded in Chromium without JavaScript
+errors. Production authenticated MCP access was not tested because endpoint-specific
+token issuance and OAuth consent have not been provisioned.
+
 Deployment settings:
 
 | Setting              | Value                                                          |

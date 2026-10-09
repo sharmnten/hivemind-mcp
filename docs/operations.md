@@ -53,5 +53,10 @@ limits for multi-instance protection. Monitor stable error codes, request status
 queue attempts and readiness. Database errors are intentionally redacted; inspect
 privileged database diagnostics securely when necessary.
 
-The Mio Hivemind Supabase project was provisioned through the Supabase plugin with the user's authorization. No billing provider, custom email delivery service, AI provider, or public application URL has been provisioned. Email/password sign-in needs existing
+The Mio Hivemind Supabase project and the [Render web service](render.md) were
+provisioned through their plugins with the user's authorization. The public
+application is <https://mio-hivemind.onrender.com>; its MCP endpoint is `/mcp`.
+Production MCP authorization still needs compatible token issuance and OAuth
+consent where required. No billing provider, custom email delivery service, or AI
+provider has been provisioned. Email/password sign-in needs existing
 Supabase users; hosted signup/email policy is managed in your Auth project.

@@ -41,11 +41,12 @@ then sign in and create the first brain. The brain creator is its admin. Invite
 other existing Auth user UUIDs through that brain's Members tab. No permanent
 user account or seeded brain was created during backend setup.
 
-The local development MCP audience is `authenticated`. Before publicly deploying
-the MCP service, configure HTTPS and resource-bound tokens as described in
-operations.md; OAuth-only chat clients additionally need a supported consent and
-authorization-server setup. The hosted database is ready; the Node application
-has not been publicly deployed.
+The local development MCP audience is `authenticated`. The Node application now
+runs at <https://mio-hivemind.onrender.com> on Render. Production MCP requires
+resource-bound tokens as described in operations.md; OAuth-only chat clients
+additionally need a supported consent and authorization-server setup. Hosting is
+configured, but production MCP token issuance and OAuth consent are still needed
+before assistants can connect. See [Render hosting](render.md).
 
 ## Verification
 
