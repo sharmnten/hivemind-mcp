@@ -11,6 +11,24 @@ const hosted = {
 };
 
 describe("hosted configuration", () => {
+  it("uses Vercel's stable production domain and isolates preview domains", () => {
+    const env = {
+      ...hosted,
+      RENDER_EXTERNAL_URL: undefined,
+      VERCEL_ENV: "production",
+      VERCEL_PROJECT_PRODUCTION_URL: "mio-hivemind.vercel.app",
+      VERCEL_URL: "mio-hivemind-unique.vercel.app",
+    };
+    expect(config(env).PUBLIC_URL).toBe("https://mio-hivemind.vercel.app");
+    expect(config(env).ALLOWED_ORIGINS).toBe("https://mio-hivemind.vercel.app");
+    expect(config({ ...env, VERCEL_ENV: "preview" }).PUBLIC_URL).toBe(
+      "https://mio-hivemind-unique.vercel.app",
+    );
+    expect(
+      config({ ...env, PUBLIC_URL: "https://memory.example" }).PUBLIC_URL,
+    ).toBe("https://memory.example");
+  });
+
   it("uses Render's assigned URL for host, origin, and MCP audience defaults", () => {
     const actual = config(hosted);
     expect(actual.PUBLIC_URL).toBe(hosted.RENDER_EXTERNAL_URL);

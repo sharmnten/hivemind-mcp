@@ -1,0 +1,57 @@
+# Vercel hosting
+
+Vercel serves the React dashboard from `apps/dashboard/dist` and runs the existing
+Express API and stateless MCP handler as one Node.js Function, exported from
+`api/index.ts`. The shared `configuredApp` factory also powers the local and Docker
+servers. Vercel-specific packaging does not change the database or memory tools.
+
+The user selected the free Hobby plan for personal, noncommercial use. Fluid
+Compute is enabled; the function runs in Cleveland (`cle1`), near the Supabase
+Ohio backend, with a 30-second request limit. Cold starts remain possible; this
+configuration does not promise an always-running process or zero startup delay.
+
+## Configuration
+
+Import `sharmnten/hivemind-mcp` from GitHub into Vercel using the repository root.
+`vercel.json` specifies `npm ci`, `npm run build`, the dashboard output directory,
+function routing, and static security headers. It uses the existing dependency
+lockfile and Node.js 24. No additional database, Redis, or AI provider is needed.
+
+Set `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, and `NODE_ENV=production` in the
+project's environment settings. Keep the local `.env` and `.vercel` directory
+out of source control. The application does not require a service-role key.
+
+Without an explicit `PUBLIC_URL`, production uses
+`https://<VERCEL_PROJECT_PRODUCTION_URL>` and previews use
+`https://<VERCEL_URL>`. The production domain is stable across deployments. Host
+and browser-origin validation use this URL, as does the expected MCP audience.
+An explicit HTTPS `PUBLIC_URL` overrides automatic domain selection. Set
+`ALLOWED_ORIGINS` only when additional exact trusted browser origins are needed.
+If changing Supabase projects, also update the static CSP in `vercel.json` to
+permit the new exact Supabase origin.
+
+Vercel serves dashboard assets through its CDN; the Express function handles
+`/api/*`, `/mcp`, `/health`, `/ready`, and `/.well-known/*`. Keep all browser API
+calls on the same origin. No vendor-specific hook URL should point at a preview
+deployment for routine use.
+
+## Jobs and authentication
+
+The existing Supabase Cron jobs recover queued synchronization every 30 seconds
+and run retention hourly. A serverless invocation may end after returning 202,
+so recovery is handled by the durable database queue, not an in-process timer.
+Do not run the optional Node worker as a persistent Vercel Function.
+
+Dashboard sign-in uses existing Supabase Auth users. Production MCP still needs
+endpoint-specific token issuance and, where required, an OAuth consent flow. A
+successful unauthenticated 401 proves that the boundary is enforced; it does not
+prove that an assistant can authenticate. See [operations](operations.md).
+
+## Verification
+
+Run `npm run check` before publishing. After deployment, verify `/health` and
+`/ready` return 200, `/api/brains` and `POST /mcp` reject unauthenticated requests,
+the resource metadata contains the stable `/mcp` URL, and the dashboard loads its
+assets and Supabase browser configuration without errors. Measure production
+startup and warm-request times separately; a few immediate requests do not
+measure the response after a prolonged idle period.

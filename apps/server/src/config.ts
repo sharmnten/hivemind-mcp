@@ -16,8 +16,14 @@ const configSchema = z.object({
   SUPABASE_WORKER_KEY: z.string().optional(),
 });
 export function config(env: NodeJS.ProcessEnv = process.env) {
+  const vercelHostname =
+    env.VERCEL_ENV === "production"
+      ? (env.VERCEL_PROJECT_PRODUCTION_URL ?? env.VERCEL_URL)
+      : env.VERCEL_URL;
   const publicUrl =
-    env.PUBLIC_URL ?? env.RENDER_EXTERNAL_URL ?? "http://127.0.0.1:3000";
+    env.PUBLIC_URL ??
+    env.RENDER_EXTERNAL_URL ??
+    (vercelHostname ? `https://${vercelHostname}` : "http://127.0.0.1:3000");
   const parsed = configSchema.safeParse({
     ...env,
     PUBLIC_URL: publicUrl,

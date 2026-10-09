@@ -3,6 +3,7 @@ node_modules
 dist
 **/dist
 .git
+.vercel
 .env
 .env.*
 !.env.example
