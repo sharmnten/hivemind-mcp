@@ -2,7 +2,7 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": null,
   "buildCommand": "npm run build",
-  "installCommand": "npm ci",
+  "installCommand": "npm ci --include=dev",
   "outputDirectory": "apps/dashboard/dist",
   "fluid": true,
   "regions": ["cle1"],

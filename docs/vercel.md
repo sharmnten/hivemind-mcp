@@ -13,9 +13,11 @@ configuration does not promise an always-running process or zero startup delay.
 ## Configuration
 
 Import `sharmnten/hivemind-mcp` from GitHub into Vercel using the repository root.
-`vercel.json` specifies `npm ci`, `npm run build`, the dashboard output directory,
+`vercel.json` specifies `npm ci --include=dev`, `npm run build`, the dashboard output directory,
 function routing, and static security headers. It uses the existing dependency
 lockfile and Node.js 24. No additional database, Redis, or AI provider is needed.
+Build dependencies must be installed even when `NODE_ENV=production`; they are
+needed by Vite and TypeScript and are excluded from the traced runtime bundle.
 
 Set `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, and `NODE_ENV=production` in the
 project's environment settings. Keep the local `.env` and `.vercel` directory
