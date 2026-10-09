@@ -1,0 +1,13 @@
+{
+  "facts": [
+    {
+      "topic": "inventory authority",
+      "content": "Inventory data is authoritative on the server.",
+      "type": "architecture",
+      "provenance": "team_decision",
+      "source": {
+        "file": "src/Inventory.server.luau"
+      }
+    }
+  ]
+}

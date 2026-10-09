@@ -1,0 +1,16 @@
+services:
+  server:
+    build: .
+    env_file: .env
+    environment:
+      HOST: 0.0.0.0
+      SUPABASE_WORKER_KEY: ""
+    ports:
+      - "127.0.0.1:3000:3000"
+    restart: unless-stopped
+  worker:
+    build: .
+    env_file: .env
+    command: ["node", "dist/apps/server/src/worker.js"]
+    profiles: [worker]
+    restart: unless-stopped

@@ -1,0 +1,25 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "type": "command",
+        "command": "node /ABSOLUTE/PATH/TO/hivemind-mcp/dist/packages/integrations/src/cli.js --root /ABSOLUTE/PATH/TO/PROJECT --client vscode --event session_start",
+        "timeout": 15
+      }
+    ],
+    "Stop": [
+      {
+        "type": "command",
+        "command": "node /ABSOLUTE/PATH/TO/hivemind-mcp/dist/packages/integrations/src/cli.js --root /ABSOLUTE/PATH/TO/PROJECT --client vscode --event task_completed",
+        "timeout": 15
+      }
+    ],
+    "PostToolUse": [
+      {
+        "type": "command",
+        "command": "node /ABSOLUTE/PATH/TO/hivemind-mcp/dist/packages/integrations/src/cli.js --root /ABSOLUTE/PATH/TO/PROJECT --client vscode --event file_changed",
+        "timeout": 15
+      }
+    ]
+  }
+}

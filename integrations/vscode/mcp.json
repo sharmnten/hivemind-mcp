@@ -1,0 +1,11 @@
+{
+  "servers": {
+    "mio-hivemind": {
+      "type": "http",
+      "url": "http://127.0.0.1:3000/mcp",
+      "headers": {
+        "Authorization": "Bearer ${env:HIVEMIND_ACCESS_TOKEN}"
+      }
+    }
+  }
+}

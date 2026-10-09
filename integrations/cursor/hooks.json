@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "hooks": {
+    "sessionStart": [
+      {
+        "command": "node /ABSOLUTE/PATH/TO/hivemind-mcp/dist/packages/integrations/src/cli.js --root /ABSOLUTE/PATH/TO/PROJECT --client cursor --event session_start"
+      }
+    ],
+    "stop": [
+      {
+        "command": "node /ABSOLUTE/PATH/TO/hivemind-mcp/dist/packages/integrations/src/cli.js --root /ABSOLUTE/PATH/TO/PROJECT --client cursor --event task_completed"
+      }
+    ],
+    "sessionEnd": [
+      {
+        "command": "node /ABSOLUTE/PATH/TO/hivemind-mcp/dist/packages/integrations/src/cli.js --root /ABSOLUTE/PATH/TO/PROJECT --client cursor --event session_end"
+      }
+    ],
+    "afterFileEdit": [
+      {
+        "command": "node /ABSOLUTE/PATH/TO/hivemind-mcp/dist/packages/integrations/src/cli.js --root /ABSOLUTE/PATH/TO/PROJECT --client cursor --event file_changed"
+      }
+    ]
+  }
+}

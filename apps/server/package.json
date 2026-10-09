@@ -1,0 +1,12 @@
+{
+  "name": "@mio/server",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "npm --prefix ../.. run dev",
+    "start": "npm --prefix ../.. run start",
+    "build": "tsc -p ../../tsconfig.build.json",
+    "typecheck": "tsc --noEmit -p ../../tsconfig.json"
+  }
+}

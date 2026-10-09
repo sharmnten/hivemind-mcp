@@ -1,0 +1,52 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node /ABSOLUTE/PATH/TO/hivemind-mcp/dist/packages/integrations/src/cli.js --root /ABSOLUTE/PATH/TO/PROJECT --client claude-code --event session_start",
+            "timeout": 15
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node /ABSOLUTE/PATH/TO/hivemind-mcp/dist/packages/integrations/src/cli.js --root /ABSOLUTE/PATH/TO/PROJECT --client claude-code --event task_completed",
+            "async": true,
+            "timeout": 15
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node /ABSOLUTE/PATH/TO/hivemind-mcp/dist/packages/integrations/src/cli.js --root /ABSOLUTE/PATH/TO/PROJECT --client claude-code --event session_end",
+            "async": true,
+            "timeout": 15
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node /ABSOLUTE/PATH/TO/hivemind-mcp/dist/packages/integrations/src/cli.js --root /ABSOLUTE/PATH/TO/PROJECT --client claude-code --event file_changed",
+            "async": true,
+            "timeout": 15
+          }
+        ]
+      }
+    ]
+  }
+}

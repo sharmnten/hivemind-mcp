@@ -1,0 +1,48 @@
+{
+  "name": "mio-hivemind",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Project-only shared memory for coding assistants, backed by Supabase",
+  "type": "module",
+  "engines": {
+    "node": ">=24.0.0"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "tsx --env-file=.env apps/server/src/main.ts",
+    "dev:dashboard": "npm run dev --workspace @mio/dashboard",
+    "build": "npm run build --workspace @mio/dashboard && tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "check": "npm run typecheck && npm test && npm run build",
+    "hook": "tsx packages/integrations/src/cli.ts",
+    "worker": "tsx --env-file=.env apps/server/src/worker.ts",
+    "db:start": "supabase start",
+    "db:reset": "supabase db reset",
+    "db:stop": "supabase stop",
+    "verify:browser": "tsx scripts/verify.ts",
+    "verify:supabase": "tsx scripts/verify.ts",
+    "format": "prettier --write apps packages tests scripts docs integrations *.json *.md *.yaml .github",
+    "start": "node --env-file=.env dist/apps/server/src/main.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.32.1",
+    "@supabase/supabase-js": "2.117.3",
+    "express": "5.2.1",
+    "zod": "4.6.5"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "0.5.8",
+    "@playwright/test": "1.64.0",
+    "@types/express": "5.0.6",
+    "@types/node": "26.6.4",
+    "prettier": "3.9.9",
+    "supabase": "2.120.0",
+    "tsx": "4.23.15",
+    "typescript": "5.9.3",
+    "vitest": "5.0.3"
+  }
+}
