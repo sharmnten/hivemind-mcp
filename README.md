@@ -17,14 +17,15 @@ Studio Global is a separate brain with explicit membership.
 
 ## Hosted application
 
-- Dashboard: <https://mio-hivemind.onrender.com>
-- MCP endpoint: <https://mio-hivemind.onrender.com/mcp>
-- [Render service](https://dashboard.render.com/web/srv-db4jsc49v7es738br3h0)
+- Dashboard: <https://mio-hivemind.vercel.app>
+- MCP endpoint: <https://mio-hivemind.vercel.app/mcp>
+- [Vercel project](https://vercel.com/sharmntens-projects/mio-hivemind)
 
-The Docker service runs on Render's Free plan with the connected Supabase backend.
+The application runs on Vercel Hobby with Fluid Compute and the connected Supabase backend.
 Sign in with an existing Supabase Auth account. MCP client access additionally
 requires endpoint-specific token issuance or OAuth configuration; ordinary
-dashboard tokens are rejected by production MCP. See [Render setup](docs/render.md).
+dashboard tokens are rejected by production MCP. See [Vercel setup](docs/vercel.md).
+The earlier [Render deployment](docs/render.md) is still available.
 
 ## Run locally
 
@@ -110,8 +111,8 @@ Read [architecture](docs/architecture.md), [security](SECURITY.md),
 [schema](docs/schema.md), and [operations](docs/operations.md) before deploying.
 The connected hosted backend is documented in [backend setup](docs/backend-setup.md). Production MCP tokens must have a resource-specific audience. OAuth-only clients
 need a provisioned authorization server; setting a URL alone does not implement
-OAuth. The provisioned web service and its configuration are documented in
-[Render hosting](docs/render.md).
+OAuth. The provisioned application and its configuration are documented in
+[Vercel hosting](docs/vercel.md), with [Render hosting](docs/render.md) also supported.
 
 MIT licensed. Contributions should run `npm run check` and avoid personal or
 production data in fixtures.

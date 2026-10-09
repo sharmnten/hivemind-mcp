@@ -42,11 +42,12 @@ other existing Auth user UUIDs through that brain's Members tab. No permanent
 user account or seeded brain was created during backend setup.
 
 The local development MCP audience is `authenticated`. The Node application now
-runs at <https://mio-hivemind.onrender.com> on Render. Production MCP requires
+runs at <https://mio-hivemind.vercel.app> on Vercel. Production MCP requires
 resource-bound tokens as described in operations.md; OAuth-only chat clients
 additionally need a supported consent and authorization-server setup. Hosting is
 configured, but production MCP token issuance and OAuth consent are still needed
-before assistants can connect. See [Render hosting](render.md).
+before assistants can connect. See [Vercel hosting](vercel.md). The earlier Render
+deployment continues to use the same backend.
 
 ## Verification
 

@@ -10,6 +10,20 @@ Compute is enabled; the function runs in Cleveland (`cle1`), near the Supabase
 Ohio backend, with a 30-second request limit. Cold starts remain possible; this
 configuration does not promise an always-running process or zero startup delay.
 
+The Vercel plugin created the project on October 9, 2026:
+
+- Project: `prj_tGAsLMM9VnjIc6RH9R0D6zVyxr7s`
+- Team: `team_wihnIEkaJ56yDvN26lKuwgen` (sharmnten's projects)
+- [Project dashboard](https://vercel.com/sharmntens-projects/mio-hivemind)
+- Application: <https://mio-hivemind.vercel.app>
+- MCP: <https://mio-hivemind.vercel.app/mcp>
+- Initial successful deployment: `dpl_9mKPi6EWAXgp6QDkpmaPh21ufJJS`
+- Initial successful commit: `0a5905b30a97b57a41c9b58d99bdb3d63ecd52ca`
+
+Git pushes to `main` trigger production deployment. Vercel account protection
+applies to preview deployments; production uses the application's Supabase
+authentication boundary so remote clients can reach the public MCP endpoint.
+
 ## Configuration
 
 Import `sharmnten/hivemind-mcp` from GitHub into Vercel using the repository root.
@@ -57,3 +71,16 @@ the resource metadata contains the stable `/mcp` URL, and the dashboard loads it
 assets and Supabase browser configuration without errors. Measure production
 startup and warm-request times separately; a few immediate requests do not
 measure the response after a prolonged idle period.
+
+The production deployment reached READY. All 52 tests, strict TypeScript checks,
+and builds passed locally and in GitHub CI. Public checks returned 200 for
+health/readiness, 401 for unauthenticated REST/MCP, and 403 for a hostile origin.
+Resource metadata matched the stable public MCP URL and the browser configuration
+pointed at the existing Supabase project. Sample already-warm health/readiness
+requests took 224 ms and 194 ms from the verification environment; those timings
+are not an idle-start guarantee. The initial deployment's runtime error scan
+returned no error/fatal logs.
+Chromium loaded the dashboard, enabled the sign-in form after fetching browser
+configuration, and passed a mobile overflow check without JavaScript or console
+errors. Authenticated production MCP access still awaits endpoint-specific token
+issuance and OAuth consent configuration.
