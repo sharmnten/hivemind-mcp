@@ -640,28 +640,56 @@ export function Workspace({
           <div className="eyebrow">YOUR ASSISTANTS, SHARED CONTEXT</div>
           <h2>Connect this brain</h2>
           <p>
-            Enroll an approved repository, install its hook configuration, and
-            give the assistant the project-memory instructions.
+            Sign in to Hivemind, copy this brain’s ID, and follow the
+            instructions for your assistant.
           </p>
           <label>
             Brain ID<code className="code-block">{brain.id}</code>
           </label>
-          <h3>1. Enroll a project workspace</h3>
+          <p>
+            <a href="https://github.com/sharmnten/hivemind-mcp/blob/main/docs/clients.md">
+              Open the step-by-step guide for ChatGPT, Codex, and Claude →
+            </a>
+          </p>
+          <p role="note">
+            Hosted MCP authentication is still unfinished. Client configuration
+            can be prepared, but tool calls need endpoint-specific token
+            issuance or OAuth. Your dashboard password or session token cannot
+            authenticate production MCP.
+          </p>
+          <h3>1. Add the MCP server</h3>
+          <code className="code-block">
+            https://mio-hivemind.vercel.app/mcp
+          </code>
+          <p>
+            ChatGPT: Plugins → Add custom MCP server. Codex: configure an HTTP
+            server in Codex settings or config.toml. Claude chat: Customize →
+            Connectors. Claude Code: add the server to your project’s .mcp.json.
+            The guide includes the configuration for each client.
+          </p>
+          <h3>2. Give your assistant this Brain ID</h3>
+          <p>
+            Ask it to call list_brains, then get_brain_context with the Brain ID
+            above. This checks access without writing memory. Each teammate
+            needs their own Hivemind identity and brain membership.
+          </p>
+          <h3>Optional: enroll a workspace for Claude Code hooks</h3>
           <pre>
             node /path/to/hivemind/dist/packages/integrations/src/cli.js
             --enroll --root /path/to/game --brain {brain.id} --server
-            https://your-hivemind-host
+            https://mio-hivemind.vercel.app
           </pre>
-          <h3>2. Configure your coding assistant</h3>
+          <h3>Install optional local hooks</h3>
           <p>
             Copy the matching configuration from{" "}
             <code>integrations/claude-code</code>,{" "}
             <code>integrations/cursor</code>, or{" "}
             <code>integrations/vscode</code>. Set the hook command to the built
-            CLI and supply your short-lived Supabase access token through the
-            local environment.
+            CLI. Hooks use a dashboard/API session token; production MCP uses a
+            separate endpoint-specific token. See the guide before configuring
+            either.
           </p>
-          <h3>3. Let project notes sync</h3>
+          <h3>Use project-only memory instructions</h3>
           <p>
             Assistant instructions maintain <code>.hivemind/notes.json</code>.
             Hooks upload those screened notes at task boundaries and retrieve
@@ -677,8 +705,8 @@ export function Workspace({
               <span>Lifecycle hooks + MCP</span>
             </div>
             <div>
-              <strong>VS Code</strong>
-              <span>Local harness hooks + MCP</span>
+              <strong>Codex CLI / IDE</strong>
+              <span>MCP tools · no Hivemind hook adapter</span>
             </div>
             <div>
               <strong>ChatGPT / Claude chat</strong>

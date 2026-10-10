@@ -60,27 +60,9 @@ run `npm run dev:dashboard` in a second terminal and use <http://localhost:5173>
 
 ## Connect an assistant
 
-Obtain your individual Supabase access token through your Auth session. Supply
-`HIVEMIND_ACCESS_TOKEN` securely to the coding client's process environment;
-tokens expire and must be refreshed through Supabase Auth. Hooks do not save
-tokens or implement a separate credential store.
+Follow the [step-by-step installation guide](docs/clients.md) for **ChatGPT, Codex CLI/IDE, Claude web/Desktop, and Claude Code**. It includes exact URLs, configuration examples, project instructions, and a first connection test.
 
-```sh
-node /path/to/hivemind-mcp/dist/packages/integrations/src/cli.js \
-  --enroll --root /path/to/approved-project \
-  --brain YOUR_BRAIN_UUID --server http://127.0.0.1:3000
-```
-
-Enrollment creates `.hivemind/config.json` and an empty notes ledger. Merge the
-matching hook/MCP examples from [integrations](integrations) into your client
-configuration, replace absolute path placeholders, and install the
-[project-memory instructions](integrations/shared/project-memory.md). Add
-`.hivemind/local/` and the machine-specific `.hivemind/config.json` to the enrolled
-project's gitignore. Review whether your project ledger belongs in source control.
-
-[Client setup and compatibility](docs/clients.md) explain Claude Code, Cursor,
-VS Code/Copilot, ChatGPT and Claude chat. Chat platforms have different auth and
-lifecycle support; automatic conversation capture is not promised.
+**Hosted MCP authentication is still unfinished.** You can prepare client configuration, but need endpoint-specific token issuance or OAuth before hosted tools can run. Ordinary dashboard tokens only support the local development MCP configuration. Dashboard signup and project administration already work.
 
 ## MCP tools
 
