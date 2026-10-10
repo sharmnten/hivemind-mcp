@@ -30,6 +30,14 @@ Hook migration: `20261010005236_mcp_oauth_audience.sql`. Revocation RPC migratio
 
 ## Verification
 
+Verified against the public Vercel deployment on October 10, 2026: username login,
+browser consent and denial, discovery and registration without Supabase-specific
+API-key headers, PKCE exchange, all 14 MCP tools, project context access, token
+refresh, authorization-code replay rejection, dashboard-token rejection, browser
+account switching without disconnecting assistants, and immediate grant
+revocation. Temporary projects and OAuth registrations were removed afterward.
+The local suite passed 75 tests, TypeScript checks and the production build.
+
 `npm run check` verifies the local application. `scripts/verify-oauth.ts` exercises hosted discovery, public client registration, browser username login/consent, PKCE code exchange, MCP tools, refresh, replay rejection, denial and revocation. Supply `HIVEMIND_USERNAME` and `HIVEMIND_PASSWORD` through the process environment; the script never prints tokens or passwords. It creates a temporary brain and OAuth client, revokes the grant and deletes the brain. It prints the fixture client UUID so the operator can remove that registration afterward using authorized Supabase management. Never delete other client registrations.
 
 Protocol/browser verification does not verify the user interface of every vendor app. Follow [the client guide](clients.md), authenticate in your installed app, and test `list_brains` and `get_brain_context` before relying on writes.

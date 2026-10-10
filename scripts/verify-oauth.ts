@@ -34,6 +34,11 @@ assert.equal(
   metadata.authorization_servers[0],
   config.supabaseUrl + "/auth/v1",
 );
+assert.equal(
+  (await fetch(base + "/mcp", { method: "POST", headers, body: "{}" })).status,
+  401,
+  "Dashboard tokens must not authenticate production MCP.",
+);
 const discovery = await fetch(
   config.supabaseUrl + "/.well-known/oauth-authorization-server/auth/v1",
 ).then((r) => r.json());
@@ -135,7 +140,7 @@ try {
   brainId = (
     await action("create_brain", {
       name: "OAuth verification",
-      overview: "Temporary project for testing assistant authorization.",
+      overview: "Temporary project for MCP integration tests.",
       is_global: false,
     })
   ).id;
@@ -226,6 +231,7 @@ try {
   await expect(page).toHaveURL(new RegExp("^http://127.0.0.1:45454/callback"));
   assert(result);
   assert.equal((result as URL).searchParams.get("error"), "access_denied");
+  assert.equal((result as URL).searchParams.get("state"), state);
   console.log(
     "Live discovery, registration, username consent, PKCE exchange, 14 MCP tools, brain access, refresh, code replay rejection and immediate revocation passed.",
   );
@@ -242,8 +248,12 @@ try {
       "OAuth grant",
       async () => {
         if (clientId) {
-          const { error } = await auth.auth.oauth.revokeGrant({ clientId });
-          if (error) throw new Error("Grant cleanup failed.");
+          const { data, error } = await auth.auth.oauth.listGrants();
+          if (error) throw new Error("Grant lookup failed.");
+          if (data?.some((grant) => grant.client.id === clientId)) {
+            const { error } = await auth.auth.oauth.revokeGrant({ clientId });
+            if (error) throw new Error("Grant cleanup failed.");
+          }
         }
       },
     ],
