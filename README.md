@@ -22,7 +22,7 @@ Studio Global is a separate brain with explicit membership.
 - [Vercel project](https://vercel.com/sharmntens-projects/mio-hivemind)
 
 The application runs on Vercel Hobby with Fluid Compute and the connected Supabase backend.
-Sign in with an existing Supabase Auth account. MCP client access additionally
+[Create an account](https://mio-hivemind.vercel.app/signup), confirm your email, and sign in. MCP client access additionally
 requires endpoint-specific token issuance or OAuth configuration; ordinary
 dashboard tokens are rejected by production MCP. See [Vercel setup](docs/vercel.md).
 The earlier [Render deployment](docs/render.md) is still available.
@@ -46,8 +46,7 @@ existing project, apply [the migrations](supabase/migrations)
 through your established Supabase migration workflow. `db:reset` destroys local
 data and is only appropriate for a disposable development stack.
 
-Create individual email/password users through Supabase Auth (local Studio or
-your project's dashboard). Hivemind uses Auth identities for login and opaque
+Create individual email/password accounts at `/signup`. Hivemind uses Auth identities for login and opaque
 UUIDs for membership; email addresses are not copied into project memory.
 
 ```sh

@@ -35,9 +35,7 @@ Environments without pg_cron can use the optional Node worker.
 npm run dev
 ```
 
-Open <http://127.0.0.1:3000>. Create your individual email/password account through
-[Supabase Auth user management](https://supabase.com/dashboard/project/oadeofxsspwkmoyjmfdn/auth/users),
-then sign in and create the first brain. The brain creator is its admin. Invite
+Open <https://mio-hivemind.vercel.app/signup> (or `/signup` on the local server), create an individual email/password account, confirm your email, then sign in and create the first brain. The brain creator is its admin. Invite
 other existing Auth user UUIDs through that brain's Members tab. No permanent
 user account or seeded brain was created during backend setup.
 

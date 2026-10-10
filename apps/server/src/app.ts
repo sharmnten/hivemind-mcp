@@ -3,6 +3,7 @@ import express, {
   type Response,
   type NextFunction,
 } from "express";
+import { resolve } from "node:path";
 import { randomUUID } from "node:crypto";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import { z } from "zod";
@@ -241,8 +242,12 @@ export function createApp(options: AppOptions) {
   app.all("/mcp", (_req, res) =>
     res.status(405).json({ error: "METHOD_NOT_ALLOWED" }),
   );
-  if (options.dashboardDir)
+  if (options.dashboardDir) {
     app.use(express.static(options.dashboardDir, { index: "index.html" }));
+    app.get(["/signup", "/login"], (_req, res) =>
+      res.sendFile(resolve(options.dashboardDir!, "index.html")),
+    );
+  }
   app.use((_req, res) => res.status(404).json({ error: "NOT_FOUND" }));
   app.use(
     (error: unknown, _req: Request, res: Response, _next: NextFunction) => {

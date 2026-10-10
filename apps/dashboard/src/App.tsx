@@ -33,29 +33,83 @@ function Logo() {
 function Login({
   client,
   error: setupError,
+  signup = false,
 }: {
   client: SupabaseClient | null;
   error: string;
+  signup?: boolean;
 }) {
   const [email, setEmail] = useState(""),
     [password, setPassword] = useState(""),
     [busy, setBusy] = useState(false),
-    [error, setError] = useState("");
+    [error, setError] = useState(""),
+    [confirmation, setConfirmation] = useState(""),
+    [notice, setNotice] = useState(""),
+    [canResend, setCanResend] = useState(false);
+  async function resend() {
+    if (!client || busy || !email) return;
+    setBusy(true);
+    setError("");
+    try {
+      const { error } = await client.auth.resend({
+        type: "signup",
+        email,
+        options: { emailRedirectTo: window.location.origin + "/" },
+      });
+      if (error) setError(error.message);
+      else
+        setNotice(
+          "Check your inbox for a confirmation link. If you already confirmed, sign in.",
+        );
+    } catch {
+      setError("Authentication service is unavailable. Try again.");
+    } finally {
+      setBusy(false);
+    }
+  }
   async function submit(e: FormEvent) {
     e.preventDefault();
     if (!client) return;
     setBusy(true);
     setError("");
     try {
-      const { error } = await client.auth.signInWithPassword({
-        email,
-        password,
-      });
-      if (error) setError("Sign-in failed. Check your studio credentials.");
+      setNotice("");
+      if (signup && password !== confirmation) {
+        setError("Passwords do not match.");
+        return;
+      }
+      if (signup) {
+        const { data, error } = await client.auth.signUp({
+          email,
+          password,
+          options: { emailRedirectTo: window.location.origin + "/" },
+        });
+        if (error) setError(error.message);
+        else if (!data.session) {
+          setNotice(
+            "Check your inbox for a confirmation link, then sign in. If you already have an account, sign in instead.",
+          );
+          setCanResend(true);
+        }
+      } else {
+        const { error } = await client.auth.signInWithPassword({
+          email,
+          password,
+        });
+        if (error) {
+          setError(
+            error.code === "email_not_confirmed"
+              ? "Confirm your email before signing in. Check your inbox or resend the link below."
+              : "Sign-in failed. Check your email and password.",
+          );
+          setCanResend(error.code === "email_not_confirmed");
+        }
+      }
     } catch {
       setError("Authentication service is unavailable.");
     } finally {
       setPassword("");
+      setConfirmation("");
       setBusy(false);
     }
   }
@@ -98,8 +152,12 @@ function Login({
       </section>
       <section className="login-form">
         <div className="eyebrow">MIO STUDIOS</div>
-        <h2>Welcome to Hivemind</h2>
-        <p className="muted">Sign in to your project brains.</p>
+        <h2>{signup ? "Create your account" : "Welcome to Hivemind"}</h2>
+        <p className="muted">
+          {signup
+            ? "Your own sign-in for shared project memory."
+            : "Sign in to your project brains."}
+        </p>
         {setupError ? (
           <div className="error" role="alert">
             {setupError}
@@ -107,7 +165,7 @@ function Login({
         ) : null}
         <form onSubmit={submit}>
           <label>
-            Studio email
+            Email
             <input
               required
               type="email"
@@ -122,24 +180,55 @@ function Login({
             <input
               required
               type="password"
-              autoComplete="current-password"
+              autoComplete={signup ? "new-password" : "current-password"}
+              minLength={signup ? 10 : undefined}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
           </label>
+          {signup ? (
+            <>
+              <p className="muted">Use at least 10 characters.</p>
+              <label>
+                Confirm password
+                <input
+                  required
+                  type="password"
+                  autoComplete="new-password"
+                  value={confirmation}
+                  onChange={(e) => setConfirmation(e.target.value)}
+                />
+              </label>
+            </>
+          ) : null}
+          {notice ? <p role="status">{notice}</p> : null}
           {error ? (
             <p className="error" role="alert">
               {error}
             </p>
           ) : null}
           <button className="primary" disabled={!client || busy}>
-            {busy ? "Signing in…" : "Sign in →"}
+            {busy ? "Please wait…" : signup ? "Create account →" : "Sign in →"}
           </button>
         </form>
+        {canResend ? (
+          <button
+            type="button"
+            disabled={busy || !email || !client}
+            onClick={() => void resend()}
+          >
+            Resend confirmation email
+          </button>
+        ) : null}
+        <p>
+          {signup ? "Already have an account? " : "New to Hivemind? "}
+          <a href={signup ? "/login" : "/signup"}>
+            {signup ? "Sign in" : "Create an account"}
+          </a>
+        </p>
         <p className="login-note">
-          Accounts and project permissions are managed by your studio
-          administrator. Your email is used by Supabase Auth; Hivemind stores
-          only opaque actor IDs.
+          Your email is used by Supabase Auth. Existing project brains require
+          an invitation from a brain administrator.
         </p>
       </section>
     </main>
@@ -166,8 +255,21 @@ export function App() {
           auth: { persistSession: true, autoRefreshToken: true },
         });
         setClient(db);
+        const callbackError = new URLSearchParams(
+          window.location.hash.slice(1),
+        ).get("error_description");
+        if (callbackError) {
+          setSetupError(
+            "The confirmation link expired or is invalid. Sign in to resend your confirmation email.",
+          );
+          window.history.replaceState(null, "", "/login");
+        }
         const { data } = db.auth.onAuthStateChange((_event, s) => {
-          if (active) setSession(s);
+          if (active) {
+            setSession(s);
+            if (s && ["/signup", "/login"].includes(window.location.pathname))
+              window.history.replaceState(null, "", "/");
+          }
         });
         unsubscribe = () => data.subscription.unsubscribe();
         void db.auth.getSession().then(({ data }) => {
@@ -185,7 +287,14 @@ export function App() {
       unsubscribe?.();
     };
   }, []);
-  if (!session || !client) return <Login client={client} error={setupError} />;
+  if (!session || !client)
+    return (
+      <Login
+        client={client}
+        error={setupError}
+        signup={window.location.pathname === "/signup"}
+      />
+    );
   return (
     <Studio
       key={session.user.id}
