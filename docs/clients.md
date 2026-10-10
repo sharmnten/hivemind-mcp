@@ -14,6 +14,7 @@ MCP server URL: **`https://mio-hivemind.vercel.app/mcp`**
 
 | Client               | Where to configure              | What is still needed for hosted use                                    |
 | -------------------- | ------------------------------- | ---------------------------------------------------------------------- |
+| ChatGPT Desktop      | Settings → MCP servers          | Endpoint-specific bearer token, or Hivemind OAuth                      |
 | ChatGPT web          | Plugins → Add custom MCP server | Hivemind OAuth login/consent flow                                      |
 | Codex CLI / IDE      | Codex `config.toml`             | Endpoint-specific bearer token, or Hivemind OAuth                      |
 | Claude web / Desktop | Customize → Connectors          | Individual bearer token where headers are supported, or Hivemind OAuth |
@@ -31,6 +32,24 @@ MCP server URL: **`https://mio-hivemind.vercel.app/mcp`**
 6. Start a new chat, type **@**, select Mio Hivemind, and send the test prompt below.
 
 Your account/workspace must allow custom MCP servers. UI labels can vary; if the creation option is missing, check workspace permissions. ChatGPT web does not read a local `.codex/config.toml` file. These steps follow the [official ChatGPT connection guide](https://developers.openai.com/plugins/deploy/connect-chatgpt).
+
+## ChatGPT Desktop
+
+**Prepare the server now; hosted tools require Hivemind MCP authentication, which is still unfinished.**
+
+1. In ChatGPT Desktop, open **Settings → MCP servers → Add server**.
+2. Enter **Mio Hivemind** as the name, select **Streamable HTTP**, and set the URL to:
+
+   ```text
+   https://mio-hivemind.vercel.app/mcp
+   ```
+
+3. Save the server and select **Restart**.
+4. When Hivemind OAuth is implemented, select **Authenticate** and complete your individual Hivemind sign-in. For bearer authentication instead, use the `config.toml` entry in the Codex section below and provide a valid endpoint-specific token in the desktop app's launch environment. Do not paste your Hivemind password into a token field.
+5. In the composer, type **`/mcp`** to inspect connected servers. Adding the URL alone does not authenticate it; a `401` is expected until valid credentials are available.
+6. Paste the project instructions and first test prompt below, replacing `YOUR_BRAIN_UUID` with the ID from Hivemind's Integrations tab.
+
+Desktop, Codex CLI, and the IDE extension share MCP configuration on the same Codex host. If you already added Hivemind there, inspect the existing entry before creating another. If **MCP servers** is missing, check your installed app version and workspace policy; the web plugin setup above is a separate path. These instructions follow [official ChatGPT Desktop MCP documentation](https://learn.chatgpt.com/docs/extend/mcp?surface=desktop); the desktop UI has not been exercised in this repository's tests.
 
 ## Codex CLI and IDE extension
 

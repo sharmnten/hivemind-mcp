@@ -60,7 +60,7 @@ run `npm run dev:dashboard` in a second terminal and use <http://localhost:5173>
 
 ## Connect an assistant
 
-Follow the [step-by-step installation guide](docs/clients.md) for **ChatGPT, Codex CLI/IDE, Claude web/Desktop, and Claude Code**. It includes exact URLs, configuration examples, project instructions, and a first connection test.
+Follow the [step-by-step installation guide](docs/clients.md) for **ChatGPT web/Desktop, Codex CLI/IDE, Claude web/Desktop, and Claude Code**. It includes exact URLs, configuration examples, project instructions, and a first connection test.
 
 **Hosted MCP authentication is still unfinished.** You can prepare client configuration, but need endpoint-specific token issuance or OAuth before hosted tools can run. Ordinary dashboard tokens only support the local development MCP configuration. Dashboard signup and project administration already work.
 
