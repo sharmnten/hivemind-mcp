@@ -58,7 +58,9 @@ and run retention hourly. A serverless invocation may end after returning 202,
 so recovery is handled by the durable database queue, not an in-process timer.
 Do not run the optional Node worker as a persistent Vercel Function.
 
-Dashboard signup is available at `/signup`, with sign-in at `/login`. Signup requests an email confirmation redirect to the current origin. In Supabase Auth URL Configuration, set Site URL to `https://mio-hivemind.vercel.app` and allow `https://mio-hivemind.vercel.app/` as a redirect. Keep email confirmation enabled. Supabase default email delivery is restricted; configure custom SMTP for signup by arbitrary teammates (see https://supabase.com/docs/guides/auth/auth-smtp). Existing brain access still requires membership.
+Dashboard signup is available at `/signup`, with sign-in at `/login`. Accounts use case-insensitive usernames (3–32 ASCII letters, digits, or underscores) and passwords. Supabase Auth stores a deterministic internal identifier at `username@users.hivemind.invalid`; this is not a mailbox. Turn **Confirm email OFF** in Supabase Authentication → Sign In / Providers → Email. No SMTP or email verification is used. Existing brain access still requires membership. Changing the internal identifier domain requires migrating Auth users and identities together while retaining UUIDs.
+
+There is no email password recovery in this flow; forgotten passwords require an administrator reset. The UI does not grant access to existing brains merely by signing up.
 
 Run `npx tsx scripts/verify-auth.ts` for browser checks with mocked Auth responses, or pass the production origin to check the deployed UI without creating accounts or sending email.
 

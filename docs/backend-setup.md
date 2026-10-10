@@ -35,7 +35,7 @@ Environments without pg_cron can use the optional Node worker.
 npm run dev
 ```
 
-Open <https://mio-hivemind.vercel.app/signup> (or `/signup` on the local server), create an individual email/password account, confirm your email, then sign in and create the first brain. The brain creator is its admin. Invite
+Open <https://mio-hivemind.vercel.app/signup> (or `/signup` on the local server), create an individual username/password account, then sign in and create the first brain. The brain creator is its admin. Invite
 other existing Auth user UUIDs through that brain's Members tab. No permanent
 user account or seeded brain was created during backend setup.
 

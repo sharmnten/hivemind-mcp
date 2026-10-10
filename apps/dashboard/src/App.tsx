@@ -13,6 +13,7 @@ import {
   type SupabaseClient,
 } from "@supabase/supabase-js";
 import type { Brain } from "../../../packages/core/src/schemas.js";
+import { usernameAddress } from "./username.js";
 import { apiClient } from "./api.js";
 const Workspace = lazy(() =>
   import("./Workspace.js").then((module) => ({ default: module.Workspace })),
@@ -39,41 +40,18 @@ function Login({
   error: string;
   signup?: boolean;
 }) {
-  const [email, setEmail] = useState(""),
+  const [username, setUsername] = useState(""),
     [password, setPassword] = useState(""),
     [busy, setBusy] = useState(false),
     [error, setError] = useState(""),
-    [confirmation, setConfirmation] = useState(""),
-    [notice, setNotice] = useState(""),
-    [canResend, setCanResend] = useState(false);
-  async function resend() {
-    if (!client || busy || !email) return;
-    setBusy(true);
-    setError("");
-    try {
-      const { error } = await client.auth.resend({
-        type: "signup",
-        email,
-        options: { emailRedirectTo: window.location.origin + "/" },
-      });
-      if (error) setError(error.message);
-      else
-        setNotice(
-          "Check your inbox for a confirmation link. If you already confirmed, sign in.",
-        );
-    } catch {
-      setError("Authentication service is unavailable. Try again.");
-    } finally {
-      setBusy(false);
-    }
-  }
+    [confirmation, setConfirmation] = useState("");
   async function submit(e: FormEvent) {
     e.preventDefault();
     if (!client) return;
     setBusy(true);
     setError("");
     try {
-      setNotice("");
+      const email = usernameAddress(username);
       if (signup && password !== confirmation) {
         setError("Passwords do not match.");
         return;
@@ -82,14 +60,12 @@ function Login({
         const { data, error } = await client.auth.signUp({
           email,
           password,
-          options: { emailRedirectTo: window.location.origin + "/" },
         });
         if (error) setError(error.message);
         else if (!data.session) {
-          setNotice(
-            "Check your inbox for a confirmation link, then sign in. If you already have an account, sign in instead.",
+          setError(
+            "Account created, but sign-in is unavailable. Please contact the administrator.",
           );
-          setCanResend(true);
         }
       } else {
         const { error } = await client.auth.signInWithPassword({
@@ -97,16 +73,15 @@ function Login({
           password,
         });
         if (error) {
-          setError(
-            error.code === "email_not_confirmed"
-              ? "Confirm your email before signing in. Check your inbox or resend the link below."
-              : "Sign-in failed. Check your email and password.",
-          );
-          setCanResend(error.code === "email_not_confirmed");
+          setError("Sign-in failed. Check your username and password.");
         }
       }
-    } catch {
-      setError("Authentication service is unavailable.");
+    } catch (error) {
+      setError(
+        error instanceof Error
+          ? error.message
+          : "Authentication service is unavailable.",
+      );
     } finally {
       setPassword("");
       setConfirmation("");
@@ -165,14 +140,19 @@ function Login({
         ) : null}
         <form onSubmit={submit}>
           <label>
-            Email
+            Username
             <input
               required
-              type="email"
+              type="text"
+              minLength={3}
+              maxLength={32}
+              pattern="[A-Za-z0-9_]{3,32}"
+              autoCapitalize="none"
+              spellCheck={false}
               autoComplete="username"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@studio.com"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="your_username"
             />
           </label>
           <label>
@@ -201,7 +181,6 @@ function Login({
               </label>
             </>
           ) : null}
-          {notice ? <p role="status">{notice}</p> : null}
           {error ? (
             <p className="error" role="alert">
               {error}
@@ -211,15 +190,6 @@ function Login({
             {busy ? "Please wait…" : signup ? "Create account →" : "Sign in →"}
           </button>
         </form>
-        {canResend ? (
-          <button
-            type="button"
-            disabled={busy || !email || !client}
-            onClick={() => void resend()}
-          >
-            Resend confirmation email
-          </button>
-        ) : null}
         <p>
           {signup ? "Already have an account? " : "New to Hivemind? "}
           <a href={signup ? "/login" : "/signup"}>
@@ -255,15 +225,6 @@ export function App() {
           auth: { persistSession: true, autoRefreshToken: true },
         });
         setClient(db);
-        const callbackError = new URLSearchParams(
-          window.location.hash.slice(1),
-        ).get("error_description");
-        if (callbackError) {
-          setSetupError(
-            "The confirmation link expired or is invalid. Sign in to resend your confirmation email.",
-          );
-          window.history.replaceState(null, "", "/login");
-        }
         const { data } = db.auth.onAuthStateChange((_event, s) => {
           if (active) {
             setSession(s);

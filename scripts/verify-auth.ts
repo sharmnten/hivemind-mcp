@@ -3,7 +3,7 @@ import express from "express";
 import { resolve } from "node:path";
 import { chromium, expect } from "@playwright/test";
 
-// Exercise UI error/confirmation flows without sending email or creating users.
+// Exercise username signup and session handling without creating real users.
 const target = process.argv[2];
 const server = target
   ? null
@@ -32,36 +32,44 @@ try {
     }),
   );
   let signups = 0;
+  const user = {
+    id: "00000000-0000-4000-8000-000000000001",
+    email: "signup_user@users.hivemind.invalid",
+    aud: "authenticated",
+    app_metadata: {},
+    user_metadata: {},
+    created_at: new Date().toISOString(),
+  };
+  const token = `${Buffer.from(JSON.stringify({ alg: "HS256" })).toString("base64url")}.${Buffer.from(JSON.stringify({ sub: user.id, exp: Math.floor(Date.now() / 1000) + 3600 })).toString("base64url")}.fixture`;
+  await page.route("**/api/brains", (r) => r.fulfill({ json: { brains: [] } }));
   await page.route("**/auth/v1/signup**", async (r) => {
     signups++;
-    assert.equal(
-      new URL(r.request().url()).searchParams.get("redirect_to"),
-      base + "/",
-    );
-    assert.equal(r.request().postDataJSON().email, "signup@example.invalid");
+    assert.equal(r.request().postDataJSON().email, user.email);
     await r.fulfill({
       json: {
-        id: "fixture-user",
-        email: "signup@example.invalid",
-        identities: [],
+        user,
+        access_token: token,
+        refresh_token: "fixture-refresh",
+        token_type: "bearer",
+        expires_in: 3600,
       },
     });
   });
-  await page.route("**/auth/v1/resend**", (r) => r.fulfill({ json: {} }));
+  await page.route("**/auth/v1/logout**", (r) => r.fulfill({ status: 204 }));
   await page.route("**/auth/v1/token**", (r) =>
     r.fulfill({
       status: 400,
-      headers: { "x-supabase-api-version": "2024-01-01" },
-      json: { error_code: "email_not_confirmed", msg: "Email not confirmed" },
+      json: {
+        error_code: "invalid_credentials",
+        msg: "Invalid login credentials",
+      },
     }),
   );
   await page.goto(base + "/signup");
   await expect(
     page.getByRole("heading", { name: "Create your account" }),
   ).toBeVisible();
-  await page
-    .getByLabel("Email", { exact: true })
-    .fill("signup@example.invalid");
+  await page.getByLabel("Username", { exact: true }).fill("Signup_USER");
   await page
     .getByLabel("Password", { exact: true })
     .fill("Fixture-password-123");
@@ -74,30 +82,19 @@ try {
     .fill("Fixture-password-123");
   await page.getByLabel("Confirm password").fill("Fixture-password-123");
   await page.getByRole("button", { name: "Create account" }).click();
-  await expect(page.getByRole("status")).toContainText("Check your inbox");
+  await expect(page.getByRole("button", { name: "Sign out" })).toBeVisible();
   assert.equal(signups, 1);
-  await page.getByRole("button", { name: "Resend confirmation email" }).click();
-  await expect(page.getByRole("status")).toContainText(
-    "If you already confirmed",
-  );
-  await page.getByRole("link", { name: "Sign in", exact: true }).click();
-  await expect(
-    page.getByRole("heading", { name: "Welcome to Hivemind" }),
-  ).toBeVisible();
-  await page
-    .getByLabel("Email", { exact: true })
-    .fill("signup@example.invalid");
-  await page
-    .getByLabel("Password", { exact: true })
-    .fill("Fixture-password-123");
+  assert.equal(new URL(page.url()).pathname, "/");
+  await page.reload();
+  await expect(page.getByRole("button", { name: "Sign out" })).toBeVisible();
+  await page.getByRole("button", { name: "Sign out" }).click();
+  await page.goto(base + "/login");
+  await page.getByLabel("Username", { exact: true }).fill("signup_user");
+  await page.getByLabel("Password", { exact: true }).fill("Wrong-password-123");
   await page.getByRole("button", { name: "Sign in" }).click();
-  await expect(page.getByRole("alert")).toContainText("Confirm your email");
-  await expect(
-    page.getByRole("button", { name: "Resend confirmation email" }),
-  ).toBeVisible();
-  await page.goto(base + "/#error=access_denied&error_description=Expired");
-  await expect(page.getByRole("alert")).toContainText("expired or is invalid");
-  assert.equal(new URL(page.url()).hash, "");
+  await expect(page.getByRole("alert")).toContainText(
+    "Check your username and password",
+  );
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto(base + "/signup");
   assert.equal(
@@ -108,7 +105,7 @@ try {
   );
   assert.deepEqual(errors, []);
   console.log(
-    "Signup, mismatch validation, resend, unconfirmed login, expired callback, and mobile layout passed (mocked Auth responses). ",
+    "Username signup, mismatch validation, immediate session, refresh, sign-out, invalid login, and mobile layout passed (mocked Auth responses).",
   );
 } finally {
   await browser.close();

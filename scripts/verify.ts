@@ -35,9 +35,10 @@ await new Promise<void>((r, j) => {
 const address = server.address();
 assert(address && typeof address !== "string");
 const url = `http://127.0.0.1:${address.port}`;
-const emails = [0, 1, 2].map(
-  (i) => `mio-verification-${randomUUID()}-${i}@example.invalid`,
+const usernames = [0, 1, 2].map(
+  (i) => `verify_${randomUUID().replaceAll("-", "").slice(0, 20)}_${i}`,
 );
+const emails = usernames.map((name) => `${name}@users.hivemind.invalid`);
 const password = `Fixture-${randomUUID()}`;
 const actors: string[] = [],
   tokens: string[] = [];
@@ -260,7 +261,7 @@ try {
   const pageErrors: string[] = [];
   page.on("pageerror", (e) => pageErrors.push(e.name));
   await page.goto(url);
-  await page.getByLabel("Studio email").fill(emails[0]!);
+  await page.getByLabel("Username").fill(usernames[0]!);
   await page.getByLabel("Password", { exact: true }).fill(password);
   await page.getByRole("button", { name: "Sign in" }).click();
   await page
