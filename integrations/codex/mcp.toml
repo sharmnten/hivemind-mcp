@@ -1,0 +1,4 @@
+# Merge into ~/.codex/config.toml or trusted project .codex/config.toml.
+# Then run: codex mcp login mio_hivemind
+[mcp_servers.mio_hivemind]
+url = "https://mio-hivemind.vercel.app/mcp"

@@ -39,13 +39,7 @@ Open <https://mio-hivemind.vercel.app/signup> (or `/signup` on the local server)
 other existing Auth user UUIDs through that brain's Members tab. No permanent
 user account or seeded brain was created during backend setup.
 
-The local development MCP audience is `authenticated`. The Node application now
-runs at <https://mio-hivemind.vercel.app> on Vercel. Production MCP requires
-resource-bound tokens as described in operations.md; OAuth-only chat clients
-additionally need a supported consent and authorization-server setup. Hosting is
-configured, but production MCP token issuance and OAuth consent are still needed
-before assistants can connect. See [Vercel hosting](vercel.md). The earlier Render
-deployment continues to use the same backend.
+The local development MCP audience is `authenticated`. The primary application runs at <https://mio-hivemind.vercel.app> on Vercel. Assistants use the Supabase OAuth server and Hivemind consent page to sign in with their existing username/password accounts. The access-token hook binds OAuth tokens to the MCP resource. See [OAuth setup](oauth.md) and [client installation](clients.md). The earlier Render deployment uses the same backend but is not the configured OAuth resource.
 
 ## Verification
 

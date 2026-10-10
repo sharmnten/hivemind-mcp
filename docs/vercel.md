@@ -64,10 +64,7 @@ There is no email password recovery in this flow; forgotten passwords require an
 
 Run `npx tsx scripts/verify-auth.ts` for browser checks with mocked Auth responses, or pass the production origin to check the deployed UI without creating accounts or sending email.
 
-Dashboard sign-in uses Supabase Auth users. Production MCP still needs
-endpoint-specific token issuance and, where required, an OAuth consent flow. A
-successful unauthenticated 401 proves that the boundary is enforced; it does not
-prove that an assistant can authenticate. See [operations](operations.md).
+Dashboard sign-in uses Supabase Auth users. Production MCP uses the same user identity through OAuth consent at `/oauth/consent`, issued by the Supabase OAuth server. `/connections` provides grant management. See [OAuth setup](oauth.md).
 
 ## Verification
 
@@ -88,5 +85,4 @@ are not an idle-start guarantee. The initial deployment's runtime error scan
 returned no error/fatal logs.
 Chromium loaded the dashboard, enabled the sign-in form after fetching browser
 configuration, and passed a mobile overflow check without JavaScript or console
-errors. Authenticated production MCP access still awaits endpoint-specific token
-issuance and OAuth consent configuration.
+errors. These checks describe the initial deployment; the subsequent OAuth verification is documented in [OAuth setup](oauth.md).

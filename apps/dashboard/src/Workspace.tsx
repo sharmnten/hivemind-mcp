@@ -652,10 +652,10 @@ export function Workspace({
             </a>
           </p>
           <p role="note">
-            Hosted MCP authentication is still unfinished. Client configuration
-            can be prepared, but tool calls need endpoint-specific token
-            issuance or OAuth. Your dashboard password or session token cannot
-            authenticate production MCP.
+            Connect using OAuth. Your assistant opens a browser; sign in with
+            your Hivemind username and password, review the client and
+            permissions, and select Allow access. Manage or revoke connections
+            under Connected assistants.
           </p>
           <h3>1. Add the MCP server</h3>
           <code className="code-block">
@@ -714,9 +714,9 @@ export function Workspace({
             </div>
           </div>
           <p className="muted">
-            Client UI connections require testing in your installed version.
-            Chat clients do not guarantee automatic synchronization. OAuth-only
-            connections need a configured authorization server.
+            Chat clients save project memory through tool calls. Optional
+            filesystem hooks are configured separately and do not capture chat
+            histories.
           </p>
         </section>
       ) : null}

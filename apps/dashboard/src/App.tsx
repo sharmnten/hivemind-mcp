@@ -13,6 +13,7 @@ import {
   type SupabaseClient,
 } from "@supabase/supabase-js";
 import type { Brain } from "../../../packages/core/src/schemas.js";
+import { OAuthConsent, OAuthConnections } from "./OAuth.js";
 import { usernameAddress } from "./username.js";
 import { apiClient } from "./api.js";
 const Workspace = lazy(() =>
@@ -45,6 +46,7 @@ function Login({
     [busy, setBusy] = useState(false),
     [error, setError] = useState(""),
     [confirmation, setConfirmation] = useState("");
+  const [registering, setRegistering] = useState(signup);
   async function submit(e: FormEvent) {
     e.preventDefault();
     if (!client) return;
@@ -52,11 +54,11 @@ function Login({
     setError("");
     try {
       const email = usernameAddress(username);
-      if (signup && password !== confirmation) {
+      if (registering && password !== confirmation) {
         setError("Passwords do not match.");
         return;
       }
-      if (signup) {
+      if (registering) {
         const { data, error } = await client.auth.signUp({
           email,
           password,
@@ -127,9 +129,9 @@ function Login({
       </section>
       <section className="login-form">
         <div className="eyebrow">MIO STUDIOS</div>
-        <h2>{signup ? "Create your account" : "Welcome to Hivemind"}</h2>
+        <h2>{registering ? "Create your account" : "Welcome to Hivemind"}</h2>
         <p className="muted">
-          {signup
+          {registering
             ? "Your own sign-in for shared project memory."
             : "Sign in to your project brains."}
         </p>
@@ -160,13 +162,13 @@ function Login({
             <input
               required
               type="password"
-              autoComplete={signup ? "new-password" : "current-password"}
-              minLength={signup ? 10 : undefined}
+              autoComplete={registering ? "new-password" : "current-password"}
+              minLength={registering ? 10 : undefined}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
           </label>
-          {signup ? (
+          {registering ? (
             <>
               <p className="muted">Use at least 10 characters.</p>
               <label>
@@ -187,14 +189,31 @@ function Login({
             </p>
           ) : null}
           <button className="primary" disabled={!client || busy}>
-            {busy ? "Please wait…" : signup ? "Create account →" : "Sign in →"}
+            {busy
+              ? "Please wait…"
+              : registering
+                ? "Create account →"
+                : "Sign in →"}
           </button>
         </form>
         <p>
-          {signup ? "Already have an account? " : "New to Hivemind? "}
-          <a href={signup ? "/login" : "/signup"}>
-            {signup ? "Sign in" : "Create an account"}
-          </a>
+          {registering ? "Already have an account? " : "New to Hivemind? "}
+          {window.location.pathname === "/oauth/consent" ? (
+            <button
+              type="button"
+              className="text-button"
+              onClick={() => {
+                setRegistering(!registering);
+                setError("");
+              }}
+            >
+              {registering ? "Sign in" : "Create an account"}
+            </button>
+          ) : (
+            <a href={registering ? "/login" : "/signup"}>
+              {registering ? "Sign in" : "Create an account"}
+            </a>
+          )}
         </p>
         <p className="login-note">
           Your email is used by Supabase Auth. Existing project brains require
@@ -255,6 +274,17 @@ export function App() {
         error={setupError}
         signup={window.location.pathname === "/signup"}
       />
+    );
+  const signOut = () => {
+    void client.auth.signOut({ scope: "local" }).then(() => setSession(null));
+  };
+  if (window.location.pathname === "/oauth/consent")
+    return <OAuthConsent client={client} onSignOut={signOut} />;
+  if (window.location.pathname === "/connections")
+    return (
+      <main className="workspace-content">
+        <OAuthConnections client={client} />
+      </main>
     );
   return (
     <Studio
@@ -361,6 +391,7 @@ function Studio({
             <br />
             Access is always explicit.
           </p>
+          <a href="/connections">Connected assistants</a>
           <button className="text-button" onClick={onSignOut}>
             Sign out ↗
           </button>

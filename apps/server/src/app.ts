@@ -244,8 +244,9 @@ export function createApp(options: AppOptions) {
   );
   if (options.dashboardDir) {
     app.use(express.static(options.dashboardDir, { index: "index.html" }));
-    app.get(["/signup", "/login"], (_req, res) =>
-      res.sendFile(resolve(options.dashboardDir!, "index.html")),
+    app.get(
+      ["/signup", "/login", "/oauth/consent", "/connections"],
+      (_req, res) => res.sendFile(resolve(options.dashboardDir!, "index.html")),
     );
   }
   app.use((_req, res) => res.status(404).json({ error: "NOT_FOUND" }));

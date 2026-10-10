@@ -18,7 +18,8 @@ export function configuredApp(env: NodeJS.ProcessEnv = process.env) {
       supabasePublishableKey: c.SUPABASE_PUBLISHABLE_KEY,
     },
     dashboardDir: env.VERCEL ? undefined : resolve("apps/dashboard/dist"),
-    oauthIssuer: c.MCP_OAUTH_ISSUER,
+    oauthIssuer:
+      c.MCP_OAUTH_ISSUER ?? `${c.SUPABASE_URL.replace(/\/$/, "")}/auth/v1`,
     ready: async () => {
       const response = await fetch(`${c.SUPABASE_URL}/auth/v1/health`, {
         headers: { apikey: c.SUPABASE_PUBLISHABLE_KEY },

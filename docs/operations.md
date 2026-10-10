@@ -36,11 +36,10 @@ may be appropriate if your authorization deployment supports it; validate actual
 PostgREST and client behavior before rollout. Do not change production audience
 validation to accept generic tokens as an OAuth shortcut.
 
-OAuth-only clients additionally require a provisioned Supabase-compatible
-authorization/consent implementation. Review Supabase's
-[OAuth server](https://supabase.com/docs/guides/auth/oauth-server) and the MCP
-[authorization specification](https://modelcontextprotocol.io/specification/latest/basic/authorization).
-Configuring discovery metadata does not implement that deployment.
+The primary deployment uses Supabase's OAuth server, the Hivemind consent page
+and the access-token hook. See [OAuth setup](oauth.md) for the enabled settings
+and verification procedure. A separate deployment needs these settings and its
+own matching resource audience; discovery metadata alone is insufficient.
 
 Apply migrations to a development project and verify before your usual production
 rollout. Back up data according to studio policy. Local `db:reset` is destructive;
@@ -56,7 +55,4 @@ privileged database diagnostics securely when necessary.
 The Mio Hivemind Supabase project, [Vercel application](vercel.md), and [Render web service](render.md) were
 provisioned through their plugins with the user's authorization. The public
 application is <https://mio-hivemind.vercel.app>; its MCP endpoint is `/mcp`.
-Production MCP authorization still needs compatible token issuance and OAuth
-consent where required. No billing provider, custom email delivery service, or AI
-provider has been provisioned. Email/password sign-in needs existing
-Supabase users; hosted signup/email policy is managed in your Auth project.
+Production MCP uses Supabase OAuth with username/password consent and a resource-specific token audience. Users manage grants at `/connections`. See [OAuth setup](oauth.md) for configuration, immediate revocation checks and verification. No billing provider, custom email delivery service or AI provider is required. Dashboard signup creates username/password identities; email confirmation is disabled for these internal identifiers.

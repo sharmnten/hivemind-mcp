@@ -10,6 +10,8 @@
     "api/index.ts": { "maxDuration": 30 }
   },
   "rewrites": [
+    { "source": "/oauth/consent", "destination": "/index.html" },
+    { "source": "/connections", "destination": "/index.html" },
     { "source": "/signup", "destination": "/index.html" },
     { "source": "/login", "destination": "/index.html" },
     { "source": "/mcp", "destination": "/api/index" },

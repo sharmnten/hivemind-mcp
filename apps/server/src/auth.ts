@@ -71,6 +71,16 @@ export function supabaseAuthentication(
         )
       )
         return null;
+      if (resource === "mcp" && mcpAudience !== "authenticated") {
+        const oauth = z
+          .object({ client_id: z.uuid(), session_id: z.uuid() })
+          .safeParse(claims);
+        if (!oauth.success) return null;
+        const { data: active, error: sessionError } = await client.rpc(
+          "hivemind_oauth_session_active",
+        );
+        if (sessionError || active !== true) return null;
+      }
       return { actorId: data.user.id, repository: supabaseRepository(client) };
     } catch {
       return null;

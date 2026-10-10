@@ -10,24 +10,24 @@ MCP server URL: **`https://mio-hivemind.vercel.app/mcp`**
 3. Open the brain's **Integrations** tab and copy its **Brain ID**. This UUID selects the project; it is not a password or access token.
 4. Check the authentication requirement below before adding the server.
 
-**Current blocker: production MCP login is not implemented yet.** The hosted dashboard works, but the hosted MCP server requires a separate, user-specific token issued for this endpoint. There is currently no button or supported command to obtain that token. A dashboard session token, Hivemind password, Supabase publishable key, or AI API key will not authenticate production MCP. The setup examples below prepare your clients; hosted tool calls will fail until token issuance or OAuth is implemented. Removing email verification did not remove MCP authentication.
+Hivemind uses OAuth: your assistant opens a browser, you sign in with your Hivemind username and password, and you approve its access. Supabase issues and refreshes the assistant's tokens. You do not need to copy dashboard tokens or configure an AI provider key. Manage and revoke access at [Connected assistants](https://mio-hivemind.vercel.app/connections).
 
-| Client               | Where to configure              | What is still needed for hosted use                                    |
-| -------------------- | ------------------------------- | ---------------------------------------------------------------------- |
-| ChatGPT Desktop      | Settings → MCP servers          | Endpoint-specific bearer token, or Hivemind OAuth                      |
-| ChatGPT web          | Plugins → Add custom MCP server | Hivemind OAuth login/consent flow                                      |
-| Codex CLI / IDE      | Codex `config.toml`             | Endpoint-specific bearer token, or Hivemind OAuth                      |
-| Claude web / Desktop | Customize → Connectors          | Individual bearer token where headers are supported, or Hivemind OAuth |
-| Claude Code          | Project `.mcp.json`             | Endpoint-specific bearer token, or Hivemind OAuth                      |
+| Client               | Where to configure              | Authentication |
+| -------------------- | ------------------------------- | -------------- |
+| ChatGPT web          | Plugins → Add custom MCP server | OAuth          |
+| ChatGPT Desktop      | Settings → MCP servers          | OAuth          |
+| Codex CLI / IDE      | Codex `config.toml`             | OAuth          |
+| Claude web / Desktop | Customize → Connectors          | OAuth          |
+| Claude Code          | Project `.mcp.json`             | OAuth          |
 
 ## ChatGPT web
 
-**Use these steps after Hivemind OAuth is available.**
+**Use your individual Hivemind account.**
 
 1. Open ChatGPT's **Plugins** tab. Select **+ → Add custom MCP server**.
 2. Name it **Mio Hivemind** and describe it as shared project memory.
 3. Under **Connection**, enter `https://mio-hivemind.vercel.app/mcp` as the public server URL.
-4. Configure OAuth and complete your individual Hivemind sign-in and consent. This step is currently unavailable in Hivemind.
+4. Choose OAuth and complete your Hivemind username/password sign-in. Review the client name and permissions, then select **Allow access**. Select **Deny** if you did not start this connection.
 5. Review the permissions, create the plugin, and install it.
 6. Start a new chat, type **@**, select Mio Hivemind, and send the test prompt below.
 
@@ -35,7 +35,7 @@ Your account/workspace must allow custom MCP servers. UI labels can vary; if the
 
 ## ChatGPT Desktop
 
-**Prepare the server now; hosted tools require Hivemind MCP authentication, which is still unfinished.**
+**Connect using OAuth, then approve the assistant in your browser.**
 
 1. In ChatGPT Desktop, open **Settings → MCP servers → Add server**.
 2. Enter **Mio Hivemind** as the name, select **Streamable HTTP**, and set the URL to:
@@ -45,29 +45,29 @@ Your account/workspace must allow custom MCP servers. UI labels can vary; if the
    ```
 
 3. Save the server and select **Restart**.
-4. When Hivemind OAuth is implemented, select **Authenticate** and complete your individual Hivemind sign-in. For bearer authentication instead, use the `config.toml` entry in the Codex section below and provide a valid endpoint-specific token in the desktop app's launch environment. Do not paste your Hivemind password into a token field.
-5. In the composer, type **`/mcp`** to inspect connected servers. Adding the URL alone does not authenticate it; a `401` is expected until valid credentials are available.
+4. Select **Authenticate** and sign in to Hivemind in the browser. Check the client details and select **Allow access**.
+5. In the composer, type **`/mcp`** to inspect connected servers. If it shows an authentication error, authenticate again rather than copying a dashboard token.
 6. Paste the project instructions and first test prompt below, replacing `YOUR_BRAIN_UUID` with the ID from Hivemind's Integrations tab.
 
 Desktop, Codex CLI, and the IDE extension share MCP configuration on the same Codex host. If you already added Hivemind there, inspect the existing entry before creating another. If **MCP servers** is missing, check your installed app version and workspace policy; the web plugin setup above is a separate path. These instructions follow [official ChatGPT Desktop MCP documentation](https://learn.chatgpt.com/docs/extend/mcp?surface=desktop); the desktop UI has not been exercised in this repository's tests.
 
 ## Codex CLI and IDE extension
 
-**Prepare this configuration now; connection requires a valid MCP token.**
+**Connect using OAuth; no token environment variable is needed.**
 
 1. Open `~/.codex/config.toml` for your user, or `.codex/config.toml` in a trusted project. Merge this entry without replacing other settings:
 
 ```toml
 [mcp_servers.mio_hivemind]
 url = "https://mio-hivemind.vercel.app/mcp"
-bearer_token_env_var = "HIVEMIND_ACCESS_TOKEN"
 ```
 
-2. Once token issuance is implemented, supply your individual MCP token as `HIVEMIND_ACCESS_TOKEN` in the environment that launches Codex. Keep the token out of the TOML file and source control. Restart Codex or the IDE extension after changing its environment.
-3. Run `codex mcp list` to check registration. In Codex CLI, `/mcp` shows connection status. Registration alone does not prove authentication works.
-4. Send the test prompt below. In the IDE, use its MCP server settings to inspect the connection.
+2. For Codex CLI, run `codex mcp login mio_hivemind`. In the browser, sign in with your Hivemind username/password and approve the client.
+3. Run `codex mcp list` to check registration. In Codex CLI, `/mcp` shows connection status.
+4. In the IDE extension, restart it after adding the configuration, open MCP server settings, and select **Authenticate**. Complete the same browser consent flow.
+5. Send the first test prompt below.
 
-The CLI and IDE share configuration on the same Codex host. OAuth-capable servers can use `codex mcp login mio_hivemind`, but Hivemind does not yet provide that flow. See [official Codex MCP documentation](https://learn.chatgpt.com/docs/extend/mcp?surface=cli). No Hivemind-specific Codex lifecycle hook adapter is installed; use tool calls for memory and handoffs.
+The CLI and IDE share configuration on the same Codex host. Remove any old `bearer_token_env_var` or Authorization header for this server so a stale token does not override OAuth. See [official Codex MCP documentation](https://learn.chatgpt.com/docs/extend/mcp?surface=cli). No Hivemind-specific Codex lifecycle hook adapter is installed; use tool calls for memory and handoffs.
 
 ## Claude web and Claude Desktop
 
@@ -75,7 +75,7 @@ The CLI and IDE share configuration on the same Codex host. OAuth-capable server
 
 1. Open **Customize → Connectors → + Add → Add custom connector**.
 2. Set the name to **Mio Hivemind** and URL to `https://mio-hivemind.vercel.app/mcp`.
-3. Review detected authentication. Once Hivemind OAuth exists, use individual sign-in. If your client offers **Request headers**, a valid individual MCP bearer token can instead be supplied as `Authorization: Bearer YOUR_MCP_TOKEN`; token issuance is currently unavailable.
+3. Choose individual OAuth sign-in. If offered an OAuth client registration choice, choose automatic registration. Sign in to Hivemind and select **Allow access** after checking the client and permissions.
 4. Finish adding the connector. In a conversation, use **+ → Connectors** to enable it.
 5. Send the test prompt below.
 
@@ -83,7 +83,7 @@ Team/Enterprise owners configure organization connectors first. A shared fixed h
 
 ## Claude Code
 
-**Prepare this configuration now; connection requires a valid MCP token.**
+**Connect using OAuth; no token environment variable is needed.**
 
 1. In the repository you want to work on, merge this into `.mcp.json`:
 
@@ -92,18 +92,17 @@ Team/Enterprise owners configure organization connectors first. A shared fixed h
   "mcpServers": {
     "mio-hivemind": {
       "type": "http",
-      "url": "https://mio-hivemind.vercel.app/mcp",
-      "headers": {
-        "Authorization": "Bearer ${HIVEMIND_ACCESS_TOKEN}"
-      }
+      "url": "https://mio-hivemind.vercel.app/mcp"
     }
   }
 }
 ```
 
-2. Once available, provide your individual MCP token through `HIVEMIND_ACCESS_TOKEN` in the environment that starts Claude Code. The `${...}` text above is a variable reference, not a token to replace in source control.
-3. Restart Claude Code, approve the project's MCP configuration when prompted, then run `/mcp` to check its status.
-4. Put the project instructions below in `CLAUDE.md`, then send the test prompt.
+2. Restart Claude Code and approve the project's MCP configuration when prompted.
+3. Run `/mcp`, select **mio-hivemind**, and authenticate. Sign in with your Hivemind username/password in the browser, review the consent screen, and select **Allow access**.
+4. Put the project instructions below in `CLAUDE.md`, then send the first test prompt.
+
+Remove any old Authorization header for this server so it uses OAuth.
 
 Optional automatic notes upload: build this repository with `npm ci` and `npm run build`; enroll your approved project using the command below; merge [hook settings](../integrations/claude-code/settings.json) into `.claude/settings.json`; replace both absolute path placeholders; append [ledger instructions](../integrations/shared/project-memory.md) to `CLAUDE.md`. Hooks need a separate dashboard/API session token in their environment: the API audience and production MCP audience differ. The current hook CLI reads `HIVEMIND_ACCESS_TOKEN` too, so supply its API token in the hook command’s environment separately from the MCP client’s token. Do not assume one token authenticates both.
 
@@ -128,7 +127,7 @@ provenance. Never save transcripts, personal information, or credentials.
 Use a handoff for unfinished technical work. Do not access other brains.
 ```
 
-After authentication works, send:
+After connecting, send:
 
 > Use Mio Hivemind to call list_brains. Then get_brain_context for brain YOUR_BRAIN_UUID and summarize its project context. Do not write anything yet.
 
@@ -136,14 +135,14 @@ Success means the tools run and return only brains your account can access. An e
 
 ## Troubleshooting
 
-| What you see                        | What it means / next step                                                                                                                |
-| ----------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
-| `401 Unauthorized`                  | Missing, expired, or wrong-audience token. Production token issuance is currently unfinished; copying a dashboard token will not fix it. |
-| Missing OAuth / failed sign-in      | Hivemind OAuth discovery, authorization, and consent need implementation. Setting `MCP_OAUTH_ISSUER` alone does not implement them.      |
-| No brains / access denied           | Sign in to the dashboard and check membership and the Brain ID.                                                                          |
-| No custom-server button             | Client account, version, or workspace policy may restrict it.                                                                            |
-| Browser visit to `/mcp` returns 405 | Expected: this MCP endpoint uses POST, not an ordinary webpage.                                                                          |
-| No automatic capture                | Tool-driven memory is separate from optional local ledger hooks.                                                                         |
+| What you see                        | What it means / next step                                                                                                                                 |
+| ----------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `401 Unauthorized`                  | Authenticate again from your assistant. Remove stale bearer headers. Dashboard tokens have a different audience and cannot be used for production MCP.    |
+| Missing OAuth / failed sign-in      | Check that the Supabase OAuth Server, dynamic registration, authorization path and access-token hook are enabled. Operators: see [OAuth setup](oauth.md). |
+| No brains / access denied           | Sign in to the dashboard and check membership and the Brain ID.                                                                                           |
+| No custom-server button             | Client account, version, or workspace policy may restrict it.                                                                                             |
+| Browser visit to `/mcp` returns 405 | Expected: this MCP endpoint uses POST, not an ordinary webpage.                                                                                           |
+| No automatic capture                | Tool-driven memory is separate from optional local ledger hooks.                                                                                          |
 
 ## Local development only
 
@@ -151,7 +150,7 @@ A loopback server with `NODE_ENV=development` and `MCP_TOKEN_AUDIENCE=authentica
 
 ## Other client adapters
 
-The following configurations are developer templates. The same production token requirement applies.
+The following older adapters include bearer-header templates. For hosted use, configure the same OAuth connection and remove dashboard-token headers. Local-development templates still support local dashboard tokens.
 
 ## Cursor
 

@@ -50,6 +50,9 @@ filesystem sandbox against a hostile local user changing directories during an
 operation. Use normal repository trust boundaries and OS permissions.
 
 Production requires HTTPS and MCP tokens issued for the exact resource audience.
+Supabase OAuth handles assistant consent, PKCE and refresh. Each MCP request also
+checks the caller's current OAuth session and grant, so revoking a connection
+blocks subsequent requests even when its signed access token has not expired.
 Never use a shared service role as a client identity. Role checks use current
 database membership, so revocation applies on subsequent calls. In-memory HTTP
 rate limits apply per server instance; add infrastructure-wide limits for a

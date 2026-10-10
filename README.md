@@ -22,9 +22,7 @@ Studio Global is a separate brain with explicit membership.
 - [Vercel project](https://vercel.com/sharmntens-projects/mio-hivemind)
 
 The application runs on Vercel Hobby with Fluid Compute and the connected Supabase backend.
-[Create an account](https://mio-hivemind.vercel.app/signup), choose a username and password, and sign in. MCP client access additionally
-requires endpoint-specific token issuance or OAuth configuration; ordinary
-dashboard tokens are rejected by production MCP. See [Vercel setup](docs/vercel.md).
+[Create an account](https://mio-hivemind.vercel.app/signup), choose a username and password, and sign in. Assistants connect using OAuth and your individual username/password sign-in; ordinary dashboard tokens remain separate from production MCP tokens. See [Vercel setup](docs/vercel.md).
 The earlier [Render deployment](docs/render.md) is still available.
 
 ## Run locally
@@ -62,7 +60,7 @@ run `npm run dev:dashboard` in a second terminal and use <http://localhost:5173>
 
 Follow the [step-by-step installation guide](docs/clients.md) for **ChatGPT web/Desktop, Codex CLI/IDE, Claude web/Desktop, and Claude Code**. It includes exact URLs, configuration examples, project instructions, and a first connection test.
 
-**Hosted MCP authentication is still unfinished.** You can prepare client configuration, but need endpoint-specific token issuance or OAuth before hosted tools can run. Ordinary dashboard tokens only support the local development MCP configuration. Dashboard signup and project administration already work.
+Assistants open Hivemind's consent page to sign in and approve access. Supabase issues renewable MCP tokens bound to the endpoint and your account. Revoke an assistant at [Connected assistants](https://mio-hivemind.vercel.app/connections). [Operator OAuth setup](docs/oauth.md) documents the Supabase settings and access-token hook.
 
 ## MCP tools
 
@@ -90,9 +88,7 @@ verification is documented in [verification](docs/verification.md).
 
 Read [architecture](docs/architecture.md), [security](SECURITY.md),
 [schema](docs/schema.md), and [operations](docs/operations.md) before deploying.
-The connected hosted backend is documented in [backend setup](docs/backend-setup.md). Production MCP tokens must have a resource-specific audience. OAuth-only clients
-need a provisioned authorization server; setting a URL alone does not implement
-OAuth. The provisioned application and its configuration are documented in
+The connected hosted backend is documented in [backend setup](docs/backend-setup.md). Production MCP tokens have a resource-specific audience; the consent flow and Supabase configuration are documented in [OAuth setup](docs/oauth.md). The provisioned application and its configuration are documented in
 [Vercel hosting](docs/vercel.md), with [Render hosting](docs/render.md) also supported.
 
 MIT licensed. Contributions should run `npm run check` and avoid personal or

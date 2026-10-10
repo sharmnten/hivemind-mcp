@@ -15,6 +15,8 @@ export async function database() {
     create schema auth;
     create schema extensions;
     create table auth.users (id uuid primary key);
+    create table auth.sessions (id uuid primary key, user_id uuid, oauth_client_id uuid, not_after timestamptz);
+    create table auth.oauth_consents (user_id uuid, client_id uuid, revoked_at timestamptz);
     insert into auth.users values ('${ADMIN}'), ('${MEMBER}'), ('${OUTSIDER}');
     create function auth.uid() returns uuid language sql stable as $$ select nullif(current_setting('request.jwt.claim.sub', true), '')::uuid $$;
     create function auth.jwt() returns jsonb language sql stable as $$ select coalesce(nullif(current_setting('request.jwt.claims', true), ''), '{}')::jsonb $$;
